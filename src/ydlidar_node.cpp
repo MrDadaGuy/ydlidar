@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <signal.h>
+#include <ydlidar/lidar_switch.h>
 
 #define DELAY_SECONDS 2
 #define DEG2RAD(x) ((x)*M_PI/180.)
@@ -274,6 +275,7 @@ bool getDeviceInfo(std::string port , int& samp_rate, double _frequency, int bau
     }
     printf("\n");
 
+    printf("超级开心的软件\n");
     printf("[YDLIDAR INFO] Current Sampling Rate : %dK\n" , _samp_rate);
     printf("[YDLIDAR INFO] Current Scan Frequency : %fHz\n" , freq);
 
@@ -309,6 +311,22 @@ bool getDeviceHealth()
         return false;
     }
 
+}
+
+bool enable_lidar(ydlidar::lidar_switch::Request& request, ydlidar::lidar_switch::Response& response)
+{
+    if (request.enable)
+    {
+        YDlidarDriver::singleton()->startMotor();
+        return true;
+    }
+    else
+    {
+        ROS_INFO("Lidar ROS service, stopping lidar.");
+        YDlidarDriver::singleton()->stop();
+        YDlidarDriver::singleton()->stopMotor();
+        return true;
+    }
 }
 
 
@@ -385,6 +403,8 @@ int main(int argc, char * argv[]) {
     printf("[YDLIDAR INFO] Current ROS Driver Version: %s\n",((std::string)ROSVerision).c_str());
     printf("[YDLIDAR INFO] Current SDK Version: %s\n",YDlidarDriver::singleton()->getSDKVersion().c_str());
 
+    // 
+    ros::ServiceServer service = nh.advertiseService("/ydlidar_node/enable_lidar", enable_lidar);
 
 
 again:
