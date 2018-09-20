@@ -7,6 +7,7 @@ find_package(catkin REQUIRED COMPONENTS
   rosconsole
   roscpp
   sensor_msgs
+  message_generation
 )
 
 #add_subdirectory(sdk)
@@ -17,6 +18,13 @@ FILE(GLOB SDK_SRC
   "${SDK_PATH}/src/impl/unix/*.cpp"
   "${SDK_PATH}/src/*.cpp"
 )
+
+add_service_files(
+  FILES
+  lidar_switch.srv
+)
+generate_messages()
+
 
 catkin_package()
 
